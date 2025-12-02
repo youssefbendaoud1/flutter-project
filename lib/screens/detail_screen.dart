@@ -22,7 +22,9 @@ class _DetailScreenState extends State<DetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(country.name),
+
         actions: [
+          // ❤️ Favorite toggle button
           IconButton(
             icon: Icon(
               provider.isFavorite(country)
@@ -33,33 +35,74 @@ class _DetailScreenState extends State<DetailScreen> {
             onPressed: () {
               provider.toggleFavorite(country);
             },
-          )
+          ),
         ],
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // FLAG WITH HERO ANIMATION
             Center(
-              child: country.flagUrl.isNotEmpty
-                  ? Image.network(country.flagUrl, height: 150)
-                  : const Icon(Icons.flag, size: 100),
+              child: SizedBox(
+                height: 180,
+                child: country.flagUrl.isNotEmpty
+                    ? Hero(
+                        tag: 'flag_${country.name}',
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            country.flagUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      )
+                    : const Icon(Icons.flag, size: 120),
+              ),
             ),
-            const SizedBox(height: 20),
 
-            Text("Capital: ${country.capital}",
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 10),
+            const SizedBox(height: 30),
 
-            Text("Region: ${country.region}"),
-            const SizedBox(height: 10),
+            // COUNTRY INFO
+            Text(
+              country.name,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
 
-            Text("Population: ${country.population}"),
+            const SizedBox(height: 15),
+
+            _buildInfoRow("Capital", country.capital),
+            _buildInfoRow("Region", country.region),
+            _buildInfoRow("Population", country.population.toString()),
           ],
         ),
       ),
     );
   }
+
+  // Small reusable info row
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Text(
+            "$label: ",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
